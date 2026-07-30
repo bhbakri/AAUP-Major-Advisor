@@ -137,12 +137,12 @@ function createFormHtml() {
         "For foreign certificates, enter the official AAUP or Palestinian Ministry equivalent percentage when available. Final eligibility requires official review.",
       equivalencyConfirmed:
         "This percentage is an official equivalent percentage.",
-      create:
-        "Create report",
-      creating:
-        "Creating your report...",
-      resultTitle:
-        "Your report",
+      create: 
+        "Ask advisor",
+      creating: 
+        "Consulting the advisor...",
+      resultTitle: 
+        "Advisor’s recommendations",
       invalidAverage:
         "Enter an average between 0 and 100.",
       reportError:
@@ -208,11 +208,11 @@ function createFormHtml() {
         "للشهادات الأجنبية، أدخل المعدل المعادل الرسمي من الجامعة أو وزارة التربية والتعليم العالي الفلسطينية عند توفره. تتطلب الأهلية النهائية مراجعة رسمية.",
       equivalencyConfirmed:
         "هذا المعدل هو معدل معادل رسمي.",
-      create:
+      create: 
         "إنشاء التقرير",
-      creating:
+      creating: 
         "جارٍ إنشاء التقرير...",
-      resultTitle:
+      resultTitle: 
         "تقريرك",
       invalidAverage:
         "أدخل معدلاً بين 0 و100.",
