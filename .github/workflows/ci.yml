@@ -37,13 +37,9 @@ jobs:
 
       - name: Check JavaScript syntax
         run: |
-          node --check server.js
-          node --check src/aaupServer.js
-          node --check src/dataValidation.js
-          node --check src/majorMatchForm.js
-          node --check src/report.js
-          node --check src/uiStrings.js
-          node --check src/utils.js
+          find . -type f -name "*.js" \
+            -not -path "./node_modules/*" \
+            -print0 | xargs -0 -n1 node --check
 
       - name: Run automated tests
         run: npm test
