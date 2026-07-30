@@ -1523,28 +1523,55 @@ function registerReportTool(
     },
 
     async (args) => {
-      const report =
-        createReport(args);
-
       const language =
         resolveToolLanguage(args);
 
-      return {
-        structuredContent: {
-          report,
-          language,
-        },
+      try {
+        const report =
+          createReport(args);
 
-        content: [
-          {
-            type:
-              "text",
-
-            text:
-              report,
+        return {
+          structuredContent: {
+            report,
+            language,
           },
-        ],
-      };
+
+          content: [
+            {
+              type: "text",
+              text: report,
+            },
+          ],
+        };
+      } catch (error) {
+        console.error(
+          "Major report generation failed:",
+          error instanceof Error
+            ? error.message
+            : "Unknown error"
+        );
+
+        const message =
+          language === "ar"
+            ? "تعذر إنشاء التقرير حالياً. يرجى المحاولة مرة أخرى لاحقاً."
+            : "The report could not be created right now. Please try again later.";
+
+        return {
+          isError: true,
+
+          structuredContent: {
+            report: "",
+            language,
+          },
+
+          content: [
+            {
+              type: "text",
+              text: message,
+            },
+          ],
+        };
+      }
     }
   );
 }

@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
-
+import express from "express";
+import rateLimit from "express-rate-limit";
 import express from "express";
 
 import {
@@ -20,7 +21,23 @@ const MCP_METHODS = new Set([
 ]);
 
 const app = express();
+  const mcpLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 30,
+    standardHeaders: true,
+    legacyHeaders: false,
 
+    skip: (req) =>
+      req.method === "OPTIONS",
+
+    message:
+      "Too many requests. Please try again shortly.",
+  });
+
+  app.use(
+    MCP_PATH,
+    mcpLimiter
+  );
 /*
   Handle CORS preflight requests
   for the Major Advisor MCP endpoint.
@@ -150,6 +167,28 @@ app.all(
           );
       }
     }
+  }
+);
+
+app.get(
+  "/.well-known/openai-apps-challenge",
+  (req, res) => {
+    const token =
+      process.env.OPENAI_APPS_CHALLENGE;
+
+    if (!token) {
+      res
+        .status(404)
+        .type("text/plain")
+        .send("Not Found");
+
+      return;
+    }
+
+    res
+      .status(200)
+      .type("text/plain")
+      .send(token);
   }
 );
 
