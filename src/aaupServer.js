@@ -4,7 +4,7 @@ import {
   registerAppResource,
   RESOURCE_MIME_TYPE,
 } from "@modelcontextprotocol/ext-apps/server";
-import { sendMajorMatchEmail } from "./email.js";
+
 import { createReport } from "./report.js";
 import {
   BRANCH_OPTIONS_BY_SYSTEM,
@@ -12,33 +12,11 @@ import {
   CERTIFICATE_SYSTEMS,
 } from "./utils.js";
 
-// Keep these imports if Course Finder is enabled.
-// import { registerCourseFinder } from "./courseFinderTool.js";
-// import { registerSharedCourseDataTool } from "./sharedCourseDataTool.js";
-
 const FORM_URI =
-  "ui://aaup/major-match-form-v4.html";
+  "ui://aaup/major-match-form-v5.html";
 
-const ARABIC_TEXT_PATTERN = /[\u0600-\u06ff]/;
-
-function resolveToolLanguage(args = {}) {
-  if (args.language === "ar") return "ar";
-  if (args.language === "en") return "en";
-
-  const combined = [
-    args.certificateSystem,
-    args.certificateType,
-    args.certificateBranch,
-    args.campusPreference,
-    args.interests,
-    args.careerGoals,
-    args.budget,
-  ].join(" ");
-
-  return ARABIC_TEXT_PATTERN.test(combined)
-    ? "ar"
-    : "en";
-}
+const ARABIC_TEXT_PATTERN =
+  /[\u0600-\u06ff]/;
 
 const languageSchema = z
   .enum(["en", "ar"])
@@ -68,13 +46,40 @@ const optionalLongTextSchema = z
   .max(500)
   .optional();
 
+function resolveToolLanguage(args = {}) {
+  if (args.language === "ar") {
+    return "ar";
+  }
+
+  if (args.language === "en") {
+    return "en";
+  }
+
+  const combined = [
+    args.certificateSystem,
+    args.certificateType,
+    args.certificateBranch,
+    args.campusPreference,
+    args.interests,
+    args.careerGoals,
+    args.budget,
+  ].join(" ");
+
+  return ARABIC_TEXT_PATTERN.test(combined)
+    ? "ar"
+    : "en";
+}
+
 function createFormHtml() {
-  const certificateOptionsJson = JSON.stringify(
-    CERTIFICATE_SYSTEM_OPTIONS
-  );
-  const branchOptionsJson = JSON.stringify(
-    BRANCH_OPTIONS_BY_SYSTEM
-  );
+  const certificateOptionsJson =
+    JSON.stringify(
+      CERTIFICATE_SYSTEM_OPTIONS
+    );
+
+  const branchOptionsJson =
+    JSON.stringify(
+      BRANCH_OPTIONS_BY_SYSTEM
+    );
 
   const translationsJson = JSON.stringify({
     en: {
@@ -82,111 +87,139 @@ function createFormHtml() {
       title: "Find programs that fit you",
       intro:
         "Enter the required details below. Your result is an initial guide, not a final admission decision.",
-      certificateSystem: "Certificate system",
-      branchTawjihi: "Tawjihi branch",
-      branchBagrut: "Bagrut classification",
-      branchForeign: "Equivalent classification",
+      certificateSystem:
+        "Certificate system",
+      branchTawjihi:
+        "Tawjihi branch",
+      branchBagrut:
+        "Bagrut classification",
+      branchForeign:
+        "Equivalent classification",
       branchTawjihiHint:
         "Required for Tawjihi applicants.",
       branchBagrutHint:
         "Choose the official classification when known.",
       branchForeignHint:
         "Choose the official equivalent classification when known.",
-      averageTawjihi: "Tawjihi average",
-      averageBagrut: "Bagrut average",
-      averageForeign: "Official equivalent percentage",
-      averagePlaceholder: "Example: 84",
-      coreAverage: "Core-subject average",
-      coreAveragePlaceholder: "Optional, such as 85",
+      averageTawjihi:
+        "Tawjihi average",
+      averageBagrut:
+        "Bagrut average",
+      averageForeign:
+        "Official equivalent percentage",
+      averagePlaceholder:
+        "Example: 84",
+      coreAverage:
+        "Core-subject average",
+      coreAveragePlaceholder:
+        "Optional, such as 85",
       coreAverageHint:
         "Only needed for some alternative Dentistry, Pharmacy, and Engineering routes.",
-      campus: "Preferred campus",
-      either: "Either campus",
-      jenin: "Jenin",
-      ramallah: "Ramallah",
-      optionalSummary: "Improve recommendations (optional)",
-      interests: "Interests and career goals",
+      campus:
+        "Preferred campus",
+      either:
+        "Either campus",
+      jenin:
+        "Jenin",
+      ramallah:
+        "Ramallah",
+      optionalSummary:
+        "Improve recommendations (optional)",
+      interests:
+        "Interests and career goals",
       interestsPlaceholder:
         "Example: AI, medicine, design, starting a business...",
-      budget: "Maximum tuition per credit hour",
-      budgetPlaceholder: "Example: 250 NIS",
+      budget:
+        "Maximum tuition per credit hour",
+      budgetPlaceholder:
+        "Example: 250 NIS",
       foreignNotice:
         "For foreign certificates, enter the official AAUP or Palestinian Ministry equivalent percentage when available. Final eligibility requires official review.",
       equivalencyConfirmed:
         "This percentage is an official equivalent percentage.",
-      create: "Create report",
-      creating: "Creating your report...",
-      resultTitle: "Your report",
-      emailTitle: "Send this report",
-      email: "Email address",
-      emailPlaceholder: "student@example.com",
-      send: "Send report",
-      sending: "Sending report...",
+      create:
+        "Create report",
+      creating:
+        "Creating your report...",
+      resultTitle:
+        "Your report",
       invalidAverage:
         "Enter an average between 0 and 100.",
-      invalidEmail: "Enter a valid email address.",
-      noReport: "Create a report first.",
       reportError:
         "The report could not be created. Please try again.",
-      emailError:
-        "The report could not be sent. Please try again.",
-      noReportReturned: "No report was returned.",
+      noReportReturned:
+        "No report was returned.",
     },
+
     ar: {
-      eyebrow: "الجامعة العربية الأمريكية · 2026/2027",
-      title: "اعثر على التخصصات المناسبة لك",
+      eyebrow:
+        "الجامعة العربية الأمريكية · 2026/2027",
+      title:
+        "اعثر على التخصصات المناسبة لك",
       intro:
         "أدخل المعلومات الأساسية أدناه. النتيجة إرشادية أولية ولا تُعد قرار قبول نهائياً.",
-      certificateSystem: "نظام الشهادة",
-      branchTawjihi: "فرع الثانوية العامة",
-      branchBagrut: "تصنيف شهادة البجروت",
-      branchForeign: "التصنيف المعادل",
+      certificateSystem:
+        "نظام الشهادة",
+      branchTawjihi:
+        "فرع الثانوية العامة",
+      branchBagrut:
+        "تصنيف شهادة البجروت",
+      branchForeign:
+        "التصنيف المعادل",
       branchTawjihiHint:
         "مطلوب لطلبة الثانوية العامة الفلسطينية.",
       branchBagrutHint:
         "اختر التصنيف الرسمي عند معرفته.",
       branchForeignHint:
         "اختر التصنيف المعادل الرسمي عند معرفته.",
-      averageTawjihi: "معدل الثانوية العامة",
-      averageBagrut: "معدل البجروت",
-      averageForeign: "المعدل المعادل الرسمي",
-      averagePlaceholder: "مثال: 84",
-      coreAverage: "معدل المباحث الأساسية",
-      coreAveragePlaceholder: "اختياري، مثل 85",
+      averageTawjihi:
+        "معدل الثانوية العامة",
+      averageBagrut:
+        "معدل البجروت",
+      averageForeign:
+        "المعدل المعادل الرسمي",
+      averagePlaceholder:
+        "مثال: 84",
+      coreAverage:
+        "معدل المباحث الأساسية",
+      coreAveragePlaceholder:
+        "اختياري، مثل 85",
       coreAverageHint:
         "يُطلب فقط لبعض المسارات البديلة في طب الأسنان والصيدلة والهندسة.",
-      campus: "الحرم الجامعي المفضل",
-      either: "أي حرم جامعي",
-      jenin: "جنين",
-      ramallah: "رام الله",
-      optionalSummary: "تحسين التوصيات (اختياري)",
-      interests: "الاهتمامات والأهداف المهنية",
+      campus:
+        "الحرم الجامعي المفضل",
+      either:
+        "أي حرم جامعي",
+      jenin:
+        "جنين",
+      ramallah:
+        "رام الله",
+      optionalSummary:
+        "تحسين التوصيات (اختياري)",
+      interests:
+        "الاهتمامات والأهداف المهنية",
       interestsPlaceholder:
         "مثال: الذكاء الاصطناعي، الطب، التصميم، تأسيس مشروع...",
-      budget: "الحد الأعلى لرسوم الساعة المعتمدة",
-      budgetPlaceholder: "مثال: 250 شيكل",
+      budget:
+        "الحد الأعلى لرسوم الساعة المعتمدة",
+      budgetPlaceholder:
+        "مثال: 250 شيكل",
       foreignNotice:
         "للشهادات الأجنبية، أدخل المعدل المعادل الرسمي من الجامعة أو وزارة التربية والتعليم العالي الفلسطينية عند توفره. تتطلب الأهلية النهائية مراجعة رسمية.",
       equivalencyConfirmed:
         "هذا المعدل هو معدل معادل رسمي.",
-      create: "إنشاء التقرير",
-      creating: "جارٍ إنشاء التقرير...",
-      resultTitle: "تقريرك",
-      emailTitle: "إرسال التقرير",
-      email: "البريد الإلكتروني",
-      emailPlaceholder: "student@example.com",
-      send: "إرسال التقرير",
-      sending: "جارٍ إرسال التقرير...",
+      create:
+        "إنشاء التقرير",
+      creating:
+        "جارٍ إنشاء التقرير...",
+      resultTitle:
+        "تقريرك",
       invalidAverage:
         "أدخل معدلاً بين 0 و100.",
-      invalidEmail:
-        "أدخل عنوان بريد إلكتروني صحيحاً.",
-      noReport: "أنشئ التقرير أولاً.",
       reportError:
         "تعذر إنشاء التقرير. يرجى المحاولة مرة أخرى.",
-      emailError:
-        "تعذر إرسال التقرير. يرجى المحاولة مرة أخرى.",
-      noReportReturned: "لم يتم إرجاع تقرير.",
+      noReportReturned:
+        "لم يتم إرجاع تقرير.",
     },
   });
 
@@ -212,6 +245,7 @@ function createFormHtml() {
       --accent-hover: #0f5d91;
       --accent-text: #ffffff;
       --focus: rgba(21, 109, 168, 0.22);
+
       box-sizing: border-box;
       width: 100%;
       max-width: 620px;
@@ -277,8 +311,7 @@ function createFormHtml() {
     }
 
     .major-match-app .intro,
-    .major-match-app .hint,
-    .major-match-app .status {
+    .major-match-app .hint {
       color: var(--muted);
     }
 
@@ -308,6 +341,7 @@ function createFormHtml() {
       background: transparent;
       font-size: 13px;
       font-weight: 700;
+      cursor: pointer;
     }
 
     .major-match-app .language-button.active {
@@ -395,8 +429,8 @@ function createFormHtml() {
 
     .major-match-app details {
       margin-top: 16px;
-      border-top: 1px solid var(--border);
       padding-top: 13px;
+      border-top: 1px solid var(--border);
     }
 
     .major-match-app summary {
@@ -445,8 +479,7 @@ function createFormHtml() {
       opacity: 0.65;
     }
 
-    .major-match-app .result-card,
-    .major-match-app .email-card {
+    .major-match-app .result-card {
       display: none;
       margin-top: 16px;
     }
@@ -463,12 +496,6 @@ function createFormHtml() {
       font-family: Arial, sans-serif;
       font-size: 14px;
       line-height: 1.6;
-    }
-
-    .major-match-app .status {
-      min-height: 20px;
-      margin: 10px 0 0;
-      font-size: 13px;
     }
 
     .major-match-app[dir="rtl"] {
@@ -497,9 +524,17 @@ function createFormHtml() {
 
   <div class="topbar">
     <div>
-      <span id="eyebrow" class="eyebrow"></span>
+      <span
+        id="eyebrow"
+        class="eyebrow"
+      ></span>
+
       <h2 id="formTitle"></h2>
-      <p id="formIntro" class="intro"></p>
+
+      <p
+        id="formIntro"
+        class="intro"
+      ></p>
     </div>
 
     <div
@@ -533,7 +568,10 @@ function createFormHtml() {
         id="certificateSystemLabel"
         for="certificateSystem"
       ></label>
-      <select id="certificateSystem"></select>
+
+      <select
+        id="certificateSystem"
+      ></select>
     </div>
 
     <div class="field">
@@ -541,13 +579,24 @@ function createFormHtml() {
         id="branchLabel"
         for="certificateBranch"
       ></label>
-      <select id="certificateBranch"></select>
-      <div id="branchHint" class="hint"></div>
+
+      <select
+        id="certificateBranch"
+      ></select>
+
+      <div
+        id="branchHint"
+        class="hint"
+      ></div>
     </div>
 
     <div class="field-grid">
       <div class="field">
-        <label id="averageLabel" for="average"></label>
+        <label
+          id="averageLabel"
+          for="average"
+        ></label>
+
         <input
           id="average"
           type="number"
@@ -559,7 +608,11 @@ function createFormHtml() {
       </div>
 
       <div class="field">
-        <label id="campusLabel" for="campusPreference"></label>
+        <label
+          id="campusLabel"
+          for="campusPreference"
+        ></label>
+
         <select id="campusPreference">
           <option value="Either"></option>
           <option value="Jenin"></option>
@@ -568,11 +621,15 @@ function createFormHtml() {
       </div>
     </div>
 
-    <div id="coreSubjectSection" class="field">
+    <div
+      id="coreSubjectSection"
+      class="field"
+    >
       <label
         id="coreAverageLabel"
         for="coreSubjectAverage"
       ></label>
+
       <input
         id="coreSubjectAverage"
         type="number"
@@ -581,7 +638,11 @@ function createFormHtml() {
         step="0.01"
         inputmode="decimal"
       />
-      <div id="coreAverageHint" class="hint"></div>
+
+      <div
+        id="coreAverageHint"
+        class="hint"
+      ></div>
     </div>
 
     <div
@@ -599,6 +660,7 @@ function createFormHtml() {
           id="equivalencyConfirmed"
           type="checkbox"
         />
+
         <label
           id="equivalencyConfirmedLabel"
           for="equivalencyConfirmed"
@@ -607,18 +669,28 @@ function createFormHtml() {
     </div>
 
     <details id="optionalDetails">
-      <summary id="optionalSummary"></summary>
+      <summary
+        id="optionalSummary"
+      ></summary>
 
       <div class="field">
         <label
           id="interestsLabel"
           for="interests"
         ></label>
-        <textarea id="interests" maxlength="500"></textarea>
+
+        <textarea
+          id="interests"
+          maxlength="500"
+        ></textarea>
       </div>
 
       <div class="field">
-        <label id="budgetLabel" for="budget"></label>
+        <label
+          id="budgetLabel"
+          for="budget"
+        ></label>
+
         <input
           id="budget"
           type="number"
@@ -636,68 +708,80 @@ function createFormHtml() {
     ></button>
   </div>
 
-  <div id="resultCard" class="card result-card">
+  <div
+    id="resultCard"
+    class="card result-card"
+  >
     <h3 id="resultTitle"></h3>
     <pre id="result"></pre>
-  </div>
-
-  <div id="emailCard" class="card email-card">
-    <h3 id="emailTitle"></h3>
-
-    <div class="field">
-      <label id="emailLabel" for="email"></label>
-      <input
-        id="email"
-        type="email"
-        maxlength="254"
-        autocomplete="email"
-      />
-    </div>
-
-    <button
-      id="sendEmail"
-      type="button"
-      class="primary-button"
-    ></button>
-
-    <p id="emailStatus" class="status" aria-live="polite"></p>
   </div>
 </div>
 
 <script>
-  const certificateOptions = ${certificateOptionsJson};
-  const branchOptionsBySystem = ${branchOptionsJson};
-  const uiText = ${translationsJson};
+  const certificateOptions =
+    ${certificateOptionsJson};
 
-  const foreignSystems = new Set([
-    "IB",
-    "IGCSE_GCSE_GCE",
-    "SAT",
-    "AP",
-    "CLEP",
-    "SaudiSecondary",
-    "OtherForeignOrArabEquivalency"
-  ]);
+  const branchOptionsBySystem =
+    ${branchOptionsJson};
 
-  const app = document.getElementById("majorMatchApp");
-  const certificateSystem = document.getElementById("certificateSystem");
-  const certificateBranch = document.getElementById("certificateBranch");
-  const averageInput = document.getElementById("average");
-  const campusPreference = document.getElementById("campusPreference");
-  const coreSubjectSection = document.getElementById("coreSubjectSection");
-  const foreignCertificateNotice = document.getElementById("foreignCertificateNotice");
-  const equivalencySection = document.getElementById("equivalencySection");
-  const resultCard = document.getElementById("resultCard");
-  const resultBox = document.getElementById("result");
-  const emailCard = document.getElementById("emailCard");
-  const emailStatus = document.getElementById("emailStatus");
-  const submitButton = document.getElementById("submit");
-  const sendEmailButton = document.getElementById("sendEmail");
-  const languageEnglish = document.getElementById("languageEnglish");
-  const languageArabic = document.getElementById("languageArabic");
+  const uiText =
+    ${translationsJson};
+
+  const foreignSystems =
+    new Set([
+      "IB",
+      "IGCSE_GCSE_GCE",
+      "SAT",
+      "AP",
+      "CLEP",
+      "SaudiSecondary",
+      "OtherForeignOrArabEquivalency"
+    ]);
+
+  const byId = function (id) {
+    return document.getElementById(id);
+  };
+
+  const app =
+    byId("majorMatchApp");
+
+  const certificateSystem =
+    byId("certificateSystem");
+
+  const certificateBranch =
+    byId("certificateBranch");
+
+  const averageInput =
+    byId("average");
+
+  const campusPreference =
+    byId("campusPreference");
+
+  const coreSubjectSection =
+    byId("coreSubjectSection");
+
+  const foreignCertificateNotice =
+    byId("foreignCertificateNotice");
+
+  const equivalencySection =
+    byId("equivalencySection");
+
+  const resultCard =
+    byId("resultCard");
+
+  const resultBox =
+    byId("result");
+
+  const submitButton =
+    byId("submit");
+
+  const languageEnglish =
+    byId("languageEnglish");
+
+  const languageArabic =
+    byId("languageArabic");
 
   let currentLanguage = "en";
-  let latestReport = "";
 
   function localizedLabel(option) {
     return currentLanguage === "ar"
@@ -706,17 +790,34 @@ function createFormHtml() {
   }
 
   function renderCertificateOptions() {
-    const selectedValue = certificateSystem.value || "Tawjihi";
+    const selectedValue =
+      certificateSystem.value ||
+      "Tawjihi";
+
     certificateSystem.innerHTML = "";
 
-    for (const option of certificateOptions) {
-      const element = document.createElement("option");
-      element.value = option.value;
-      element.textContent = localizedLabel(option);
-      certificateSystem.appendChild(element);
+    for (
+      const option
+      of certificateOptions
+    ) {
+      const element =
+        document.createElement(
+          "option"
+        );
+
+      element.value =
+        option.value;
+
+      element.textContent =
+        localizedLabel(option);
+
+      certificateSystem.appendChild(
+        element
+      );
     }
 
-    certificateSystem.value = selectedValue;
+    certificateSystem.value =
+      selectedValue;
   }
 
   function currentBranchOptions(system) {
@@ -732,228 +833,454 @@ function createFormHtml() {
   }
 
   function renderBranchOptions() {
-    const selectedValue = certificateBranch.value;
-    const options = currentBranchOptions(certificateSystem.value);
+    const selectedValue =
+      certificateBranch.value;
+
+    const options =
+      currentBranchOptions(
+        certificateSystem.value
+      );
+
     certificateBranch.innerHTML = "";
 
     for (const option of options) {
-      const element = document.createElement("option");
-      element.value = option.value;
-      element.textContent = localizedLabel(option);
-      certificateBranch.appendChild(element);
+      const element =
+        document.createElement(
+          "option"
+        );
+
+      element.value =
+        option.value;
+
+      element.textContent =
+        localizedLabel(option);
+
+      certificateBranch.appendChild(
+        element
+      );
     }
 
-    if (options.some(function (option) {
-      return option.value === selectedValue;
-    })) {
-      certificateBranch.value = selectedValue;
+    const selectedStillExists =
+      options.some(
+        function (option) {
+          return (
+            option.value ===
+            selectedValue
+          );
+        }
+      );
+
+    if (selectedStillExists) {
+      certificateBranch.value =
+        selectedValue;
     }
   }
 
   function updateCertificateFields() {
-    const text = uiText[currentLanguage];
-    const system = certificateSystem.value;
-    const isForeign = foreignSystems.has(system);
+    const text =
+      uiText[currentLanguage];
+
+    const system =
+      certificateSystem.value;
+
+    const isForeign =
+      foreignSystems.has(system);
 
     renderBranchOptions();
 
     if (system === "Tawjihi") {
-      document.getElementById("branchLabel").textContent = text.branchTawjihi;
-      document.getElementById("branchHint").textContent = text.branchTawjihiHint;
-      document.getElementById("averageLabel").textContent = text.averageTawjihi;
-      coreSubjectSection.style.display = "block";
+      byId(
+        "branchLabel"
+      ).textContent =
+        text.branchTawjihi;
+
+      byId(
+        "branchHint"
+      ).textContent =
+        text.branchTawjihiHint;
+
+      byId(
+        "averageLabel"
+      ).textContent =
+        text.averageTawjihi;
+
+      coreSubjectSection.style.display =
+        "block";
     } else if (system === "Bagrut") {
-      document.getElementById("branchLabel").textContent = text.branchBagrut;
-      document.getElementById("branchHint").textContent = text.branchBagrutHint;
-      document.getElementById("averageLabel").textContent = text.averageBagrut;
-      coreSubjectSection.style.display = "none";
+      byId(
+        "branchLabel"
+      ).textContent =
+        text.branchBagrut;
+
+      byId(
+        "branchHint"
+      ).textContent =
+        text.branchBagrutHint;
+
+      byId(
+        "averageLabel"
+      ).textContent =
+        text.averageBagrut;
+
+      coreSubjectSection.style.display =
+        "none";
     } else {
-      document.getElementById("branchLabel").textContent = text.branchForeign;
-      document.getElementById("branchHint").textContent = text.branchForeignHint;
-      document.getElementById("averageLabel").textContent = text.averageForeign;
-      coreSubjectSection.style.display = "none";
+      byId(
+        "branchLabel"
+      ).textContent =
+        text.branchForeign;
+
+      byId(
+        "branchHint"
+      ).textContent =
+        text.branchForeignHint;
+
+      byId(
+        "averageLabel"
+      ).textContent =
+        text.averageForeign;
+
+      coreSubjectSection.style.display =
+        "none";
     }
 
-    foreignCertificateNotice.style.display = isForeign ? "block" : "none";
-    equivalencySection.style.display = isForeign ? "block" : "none";
+    foreignCertificateNotice
+      .style
+      .display =
+        isForeign
+          ? "block"
+          : "none";
+
+    equivalencySection
+      .style
+      .display =
+        isForeign
+          ? "block"
+          : "none";
   }
 
   function applyLanguage(language) {
-    currentLanguage = language === "ar" ? "ar" : "en";
-    const text = uiText[currentLanguage];
-    const isArabic = currentLanguage === "ar";
+    currentLanguage =
+      language === "ar"
+        ? "ar"
+        : "en";
 
-    app.lang = currentLanguage;
-    app.dir = isArabic ? "rtl" : "ltr";
-    resultBox.dir = isArabic ? "rtl" : "ltr";
+    const text =
+      uiText[currentLanguage];
 
-    languageEnglish.classList.toggle("active", !isArabic);
-    languageArabic.classList.toggle("active", isArabic);
-    languageEnglish.setAttribute("aria-pressed", String(!isArabic));
-    languageArabic.setAttribute("aria-pressed", String(isArabic));
+    const isArabic =
+      currentLanguage === "ar";
 
-    document.getElementById("eyebrow").textContent = text.eyebrow;
-    document.getElementById("formTitle").textContent = text.title;
-    document.getElementById("formIntro").textContent = text.intro;
-    document.getElementById("certificateSystemLabel").textContent = text.certificateSystem;
-    document.getElementById("coreAverageLabel").textContent = text.coreAverage;
-    document.getElementById("coreAverageHint").textContent = text.coreAverageHint;
-    document.getElementById("campusLabel").textContent = text.campus;
-    document.getElementById("optionalSummary").textContent = text.optionalSummary;
-    document.getElementById("interestsLabel").textContent = text.interests;
-    document.getElementById("budgetLabel").textContent = text.budget;
-    document.getElementById("equivalencyConfirmedLabel").textContent = text.equivalencyConfirmed;
-    document.getElementById("resultTitle").textContent = text.resultTitle;
-    document.getElementById("emailTitle").textContent = text.emailTitle;
-    document.getElementById("emailLabel").textContent = text.email;
+    app.lang =
+      currentLanguage;
 
-    averageInput.placeholder = text.averagePlaceholder;
-    document.getElementById("coreSubjectAverage").placeholder = text.coreAveragePlaceholder;
-    document.getElementById("interests").placeholder = text.interestsPlaceholder;
-    document.getElementById("budget").placeholder = text.budgetPlaceholder;
-    document.getElementById("email").placeholder = text.emailPlaceholder;
+    app.dir =
+      isArabic
+        ? "rtl"
+        : "ltr";
 
-    submitButton.textContent = text.create;
-    sendEmailButton.textContent = text.send;
-    foreignCertificateNotice.textContent = text.foreignNotice;
+    resultBox.dir =
+      isArabic
+        ? "rtl"
+        : "ltr";
 
-    campusPreference.options[0].textContent = text.either;
-    campusPreference.options[1].textContent = text.jenin;
-    campusPreference.options[2].textContent = text.ramallah;
+    languageEnglish
+      .classList
+      .toggle(
+        "active",
+        !isArabic
+      );
+
+    languageArabic
+      .classList
+      .toggle(
+        "active",
+        isArabic
+      );
+
+    languageEnglish
+      .setAttribute(
+        "aria-pressed",
+        String(!isArabic)
+      );
+
+    languageArabic
+      .setAttribute(
+        "aria-pressed",
+        String(isArabic)
+      );
+
+    byId("eyebrow").textContent =
+      text.eyebrow;
+
+    byId("formTitle").textContent =
+      text.title;
+
+    byId("formIntro").textContent =
+      text.intro;
+
+    byId(
+      "certificateSystemLabel"
+    ).textContent =
+      text.certificateSystem;
+
+    byId(
+      "coreAverageLabel"
+    ).textContent =
+      text.coreAverage;
+
+    byId(
+      "coreAverageHint"
+    ).textContent =
+      text.coreAverageHint;
+
+    byId(
+      "campusLabel"
+    ).textContent =
+      text.campus;
+
+    byId(
+      "optionalSummary"
+    ).textContent =
+      text.optionalSummary;
+
+    byId(
+      "interestsLabel"
+    ).textContent =
+      text.interests;
+
+    byId(
+      "budgetLabel"
+    ).textContent =
+      text.budget;
+
+    byId(
+      "equivalencyConfirmedLabel"
+    ).textContent =
+      text.equivalencyConfirmed;
+
+    byId(
+      "resultTitle"
+    ).textContent =
+      text.resultTitle;
+
+    averageInput.placeholder =
+      text.averagePlaceholder;
+
+    byId(
+      "coreSubjectAverage"
+    ).placeholder =
+      text.coreAveragePlaceholder;
+
+    byId(
+      "interests"
+    ).placeholder =
+      text.interestsPlaceholder;
+
+    byId(
+      "budget"
+    ).placeholder =
+      text.budgetPlaceholder;
+
+    submitButton.textContent =
+      text.create;
+
+    foreignCertificateNotice
+      .textContent =
+        text.foreignNotice;
+
+    campusPreference
+      .options[0]
+      .textContent =
+        text.either;
+
+    campusPreference
+      .options[1]
+      .textContent =
+        text.jenin;
+
+    campusPreference
+      .options[2]
+      .textContent =
+        text.ramallah;
 
     renderCertificateOptions();
     updateCertificateFields();
   }
 
-  certificateSystem.addEventListener("change", function () {
-    updateCertificateFields();
-  });
+  certificateSystem
+    .addEventListener(
+      "change",
+      function () {
+        updateCertificateFields();
+      }
+    );
 
-  languageEnglish.addEventListener("click", function () {
-    applyLanguage("en");
-  });
+  languageEnglish
+    .addEventListener(
+      "click",
+      function () {
+        applyLanguage("en");
+      }
+    );
 
-  languageArabic.addEventListener("click", function () {
-    applyLanguage("ar");
-  });
+  languageArabic
+    .addEventListener(
+      "click",
+      function () {
+        applyLanguage("ar");
+      }
+    );
 
-  submitButton.addEventListener("click", async function () {
-    const text = uiText[currentLanguage];
-    const average = Number(averageInput.value);
+  submitButton
+    .addEventListener(
+      "click",
+      async function () {
+        const text =
+          uiText[currentLanguage];
 
-    if (
-      averageInput.value.trim() === "" ||
-      !Number.isFinite(average) ||
-      average < 0 ||
-      average > 100
-    ) {
-      resultCard.style.display = "block";
-      resultBox.textContent = text.invalidAverage;
-      averageInput.focus();
-      return;
-    }
+        const average =
+          Number(
+            averageInput.value
+          );
 
-    submitButton.disabled = true;
-    submitButton.textContent = text.creating;
-    resultCard.style.display = "block";
-    resultBox.textContent = text.creating;
-    emailCard.style.display = "none";
-    emailStatus.textContent = "";
+        const invalidAverage =
+          averageInput
+            .value
+            .trim() === "" ||
+          !Number.isFinite(
+            average
+          ) ||
+          average < 0 ||
+          average > 100;
 
-    const args = {
-      language: currentLanguage,
-      certificateSystem: certificateSystem.value,
-      certificateBranch: certificateBranch.value,
-      average: averageInput.value,
-      coreSubjectAverage: document.getElementById("coreSubjectAverage").value,
-      equivalencyConfirmed: document.getElementById("equivalencyConfirmed").checked,
-      campusPreference: campusPreference.value,
-      interests: document.getElementById("interests").value,
-      careerGoals: "",
-      budget: document.getElementById("budget").value,
-      maxResults: 5
-    };
+        if (invalidAverage) {
+          resultCard.style.display =
+            "block";
 
-    try {
-      const result = await window.openai.callTool(
-        "create_major_match_report",
-        args
-      );
+          resultBox.textContent =
+            text.invalidAverage;
 
-      latestReport =
-        result?.structuredContent?.report ||
-        result?.content?.find(function (item) {
-          return item.type === "text";
-        })?.text ||
-        text.noReportReturned;
-
-      resultBox.textContent = latestReport;
-      emailCard.style.display = "block";
-    } catch (error) {
-      latestReport = "";
-      resultBox.textContent = text.reportError;
-      console.error(error);
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = text.create;
-    }
-  });
-
-  sendEmailButton.addEventListener("click", async function () {
-    const text = uiText[currentLanguage];
-    const emailInput = document.getElementById("email");
-    const email = emailInput.value.trim();
-
-    if (!latestReport) {
-      emailStatus.textContent = text.noReport;
-      return;
-    }
-
-    if (!email || !emailInput.checkValidity()) {
-      emailStatus.textContent = text.invalidEmail;
-      emailInput.focus();
-      return;
-    }
-
-    sendEmailButton.disabled = true;
-    sendEmailButton.textContent = text.sending;
-    emailStatus.textContent = text.sending;
-
-    try {
-      const result = await window.openai.callTool(
-        "send_major_match_email",
-        {
-          email: email,
-          report: latestReport,
-          language: currentLanguage
+          averageInput.focus();
+          return;
         }
-      );
 
-      emailStatus.textContent =
-        result?.structuredContent?.message ||
-        result?.content?.find(function (item) {
-          return item.type === "text";
-        })?.text ||
-        text.emailError;
-    } catch (error) {
-      emailStatus.textContent = text.emailError;
-      console.error(error);
-    } finally {
-      sendEmailButton.disabled = false;
-      sendEmailButton.textContent = text.send;
-    }
-  });
+        submitButton.disabled =
+          true;
+
+        submitButton.textContent =
+          text.creating;
+
+        resultCard.style.display =
+          "block";
+
+        resultBox.textContent =
+          text.creating;
+
+        const args = {
+          language:
+            currentLanguage,
+
+          certificateSystem:
+            certificateSystem.value,
+
+          certificateBranch:
+            certificateBranch.value,
+
+          average:
+            averageInput.value,
+
+          coreSubjectAverage:
+            byId(
+              "coreSubjectAverage"
+            ).value,
+
+          equivalencyConfirmed:
+            byId(
+              "equivalencyConfirmed"
+            ).checked,
+
+          campusPreference:
+            campusPreference.value,
+
+          interests:
+            byId(
+              "interests"
+            ).value,
+
+          careerGoals:
+            "",
+
+          budget:
+            byId(
+              "budget"
+            ).value,
+
+          maxResults:
+            5
+        };
+
+        try {
+          const result =
+            await window.openai.callTool(
+              "create_major_match_report",
+              args
+            );
+
+          const textContent =
+            result?.content?.find(
+              function (item) {
+                return (
+                  item.type ===
+                  "text"
+                );
+              }
+            )?.text;
+
+          const report =
+            result
+              ?.structuredContent
+              ?.report ||
+            textContent ||
+            text.noReportReturned;
+
+          resultBox.textContent =
+            report;
+        } catch (error) {
+          resultBox.textContent =
+            text.reportError;
+
+          console.error(error);
+        } finally {
+          submitButton.disabled =
+            false;
+
+          submitButton.textContent =
+            text.create;
+        }
+      }
+    );
 
   const browserPrefersArabic =
     typeof navigator !== "undefined" &&
-    String(navigator.language || "").toLowerCase().startsWith("ar");
+    String(
+      navigator.language || ""
+    )
+      .toLowerCase()
+      .startsWith("ar");
 
-  applyLanguage(browserPrefersArabic ? "ar" : "en");
+  applyLanguage(
+    browserPrefersArabic
+      ? "ar"
+      : "en"
+  );
 </script>
 `.trim();
 }
 
-function registerMajorMatchForm(server) {
+function registerMajorMatchForm(
+  server
+) {
   registerAppResource(
     server,
     "AAUP Major Match Form",
@@ -965,15 +1292,26 @@ function registerMajorMatchForm(server) {
     async () => ({
       contents: [
         {
-          uri: FORM_URI,
-          mimeType: RESOURCE_MIME_TYPE,
-          text: createFormHtml(),
+          uri:
+            FORM_URI,
+
+          mimeType:
+            RESOURCE_MIME_TYPE,
+
+          text:
+            createFormHtml(),
+
           _meta: {
             ui: {
-              prefersBorder: true,
+              prefersBorder:
+                true,
+
               csp: {
-                connectDomains: [],
-                resourceDomains: [],
+                connectDomains:
+                  [],
+
+                resourceDomains:
+                  [],
               },
             },
           },
@@ -983,11 +1321,14 @@ function registerMajorMatchForm(server) {
   );
 }
 
-function registerShowFormTool(server) {
+function registerShowFormTool(
+  server
+) {
   server.registerTool(
     "show_major_match_form",
     {
-      title: "Show AAUP Major Match Form",
+      title:
+        "Show AAUP Major Match Form",
 
       description:
         "Opens the bilingual AAUP major-matching form. Use this only after the student chooses the form or explicitly asks for a form, dropdown, or visual interface.",
@@ -995,18 +1336,29 @@ function registerShowFormTool(server) {
       inputSchema: {},
 
       annotations: {
-        readOnlyHint: true,
-        openWorldHint: false,
-        destructiveHint: false,
+        readOnlyHint:
+          true,
+
+        openWorldHint:
+          false,
+
+        destructiveHint:
+          false,
       },
 
       _meta: {
         ui: {
-          resourceUri: FORM_URI,
-          visibility: ["model", "app"],
+          resourceUri:
+            FORM_URI,
+
+          visibility: [
+            "model",
+            "app",
+          ],
         },
 
-        "openai/outputTemplate": FORM_URI,
+        "openai/outputTemplate":
+          FORM_URI,
 
         "openai/toolInvocation/invoking":
           "Opening form...",
@@ -1021,7 +1373,9 @@ function registerShowFormTool(server) {
 
       content: [
         {
-          type: "text",
+          type:
+            "text",
+
           text:
             "Use the bilingual form below to create an initial AAUP major-match report.",
         },
@@ -1030,158 +1384,164 @@ function registerShowFormTool(server) {
   );
 }
 
-function registerEmailTool(server) {
-  server.registerTool(
-    "send_major_match_email",
-    {
-      title: "Send Major Match Report Email",
-      description:
-        "Sends an already-created AAUP major-match report to the email address supplied by the student. Call only after explicit confirmation.",
-      inputSchema: {
-        email: z
-          .string()
-          .trim()
-          .email()
-          .max(254)
-          .describe(
-            "Email address to receive the report"
-          ),
-        report: z
-          .string()
-          .trim()
-          .min(1)
-          .max(100_000)
-          .describe(
-            "The completed report text returned by create_major_match_report"
-          ),
-        language: languageSchema.describe(
-          "Email language: en for English or ar for Arabic"
-        ),
-      },
-      annotations: {
-        readOnlyHint: false,
-        openWorldHint: true,
-        destructiveHint: true,
-      },
-      _meta: {
-        ui: {
-          visibility: ["model", "app"],
-        },
-        "openai/widgetAccessible": true,
-        "openai/toolInvocation/invoking":
-          "Sending report...",
-        "openai/toolInvocation/invoked":
-          "Email request completed.",
-      },
-    },
-    async (args) => {
-      const result =
-        await sendMajorMatchEmail(args);
-
-      return {
-        structuredContent: result,
-        content: [
-          {
-            type: "text",
-            text: result.message,
-          },
-        ],
-      };
-    }
-  );
-}
-
-function registerReportTool(server) {
+function registerReportTool(
+  server
+) {
   server.registerTool(
     "create_major_match_report",
     {
-      title: "Create AAUP Major Match Report",
+      title:
+        "Create AAUP Major Match Report",
+
       description:
         "Creates an English or Arabic preliminary report from the full 2026/2027 AAUP bachelor-program dataset.",
+
       inputSchema: {
-        language: languageSchema.describe(
-          "Report language. Infer ar for Arabic conversations and en for English unless the student explicitly chooses another language."
-        ),
-        certificateSystem: z
-          .enum(CERTIFICATE_SYSTEMS)
-          .optional()
-          .describe("Certificate system"),
-        certificateBranch: optionalShortTextSchema.describe(
-          "Tawjihi branch or Scientific/Literary classification"
-        ),
-        certificateType: optionalShortTextSchema.describe(
-          "Backward-compatible field that may contain the old Tawjihi branch or a certificate-system name"
-        ),
-        average: percentageInputSchema.describe(
-          "Student percentage from 0 to 100"
-        ),
+        language:
+          languageSchema.describe(
+            "Report language. Infer ar for Arabic conversations and en for English unless the student explicitly chooses another language."
+          ),
+
+        certificateSystem:
+          z
+            .enum(
+              CERTIFICATE_SYSTEMS
+            )
+            .optional()
+            .describe(
+              "Certificate system"
+            ),
+
+        certificateBranch:
+          optionalShortTextSchema.describe(
+            "Tawjihi branch or Scientific/Literary classification"
+          ),
+
+        certificateType:
+          optionalShortTextSchema.describe(
+            "Backward-compatible field that may contain the old Tawjihi branch or a certificate-system name"
+          ),
+
+        average:
+          percentageInputSchema.describe(
+            "Student percentage from 0 to 100"
+          ),
+
         coreSubjectAverage:
           optionalPercentageInputSchema.describe(
             "Optional core-subject average for alternative Tawjihi admission routes"
           ),
-        equivalencyConfirmed: z
-          .boolean()
-          .optional()
-          .describe(
-            "Whether a foreign-certificate equivalent percentage is officially confirmed"
+
+        equivalencyConfirmed:
+          z
+            .boolean()
+            .optional()
+            .describe(
+              "Whether a foreign-certificate equivalent percentage is officially confirmed"
+            ),
+
+        campusPreference:
+          optionalShortTextSchema.describe(
+            "Jenin, Ramallah, or Either"
           ),
-        campusPreference: optionalShortTextSchema.describe(
-          "Jenin, Ramallah, or Either"
-        ),
-        interests: optionalLongTextSchema.describe(
-          "Student interests and preferred subject areas"
-        ),
-        careerGoals: optionalLongTextSchema.describe(
-          "Student career goals"
-        ),
-        budget: z
-          .union([
-            z.number().nonnegative(),
-            z.string().trim().max(50),
-          ])
-          .optional()
-          .describe(
-            "Maximum preferred tuition per credit hour"
+
+        interests:
+          optionalLongTextSchema.describe(
+            "Student interests and preferred subject areas"
           ),
-        maxResults: z
-          .union([
-            z.number().int().min(1).max(10),
-            z.string().trim().max(10),
-          ])
-          .optional()
-          .describe(
-            "Maximum number of results per section, from 1 to 10"
+
+        careerGoals:
+          optionalLongTextSchema.describe(
+            "Student career goals"
           ),
+
+        budget:
+          z
+            .union([
+              z
+                .number()
+                .nonnegative(),
+
+              z
+                .string()
+                .trim()
+                .max(50),
+            ])
+            .optional()
+            .describe(
+              "Maximum preferred tuition per credit hour"
+            ),
+
+        maxResults:
+          z
+            .union([
+              z
+                .number()
+                .int()
+                .min(1)
+                .max(10),
+
+              z
+                .string()
+                .trim()
+                .max(10),
+            ])
+            .optional()
+            .describe(
+              "Maximum number of results per section, from 1 to 10"
+            ),
       },
+
       annotations: {
-        readOnlyHint: true,
-        openWorldHint: false,
-        destructiveHint: false,
+        readOnlyHint:
+          true,
+
+        openWorldHint:
+          false,
+
+        destructiveHint:
+          false,
       },
+
       _meta: {
         ui: {
-          visibility: ["app", "model"],
+          visibility: [
+            "app",
+            "model",
+          ],
         },
-        "openai/widgetAccessible": true,
+
+        "openai/widgetAccessible":
+          true,
+
         "openai/toolInvocation/invoking":
           "Creating report...",
+
         "openai/toolInvocation/invoked":
           "Report created.",
       },
     },
+
     async (args) => {
-      const report = createReport(args);
-      const language = resolveToolLanguage(args);
+      const report =
+        createReport(args);
+
+      const language =
+        resolveToolLanguage(args);
 
       return {
         structuredContent: {
           report,
           language,
         },
+
         content: [
           {
-            type: "text",
-            text: report,
+            type:
+              "text",
+
+            text:
+              report,
           },
         ],
       };
@@ -1192,9 +1552,13 @@ function registerReportTool(server) {
 export function createMajorAdvisorServer() {
   const server = new McpServer(
     {
-      name: "aaup-major-match",
-      version: "0.4.0",
+      name:
+        "aaup-major-match",
+
+      version:
+        "0.4.1",
     },
+
     {
       instructions:
         "Help students explore AAUP bachelor programs for academic year 2026/2027. " +
@@ -1206,20 +1570,22 @@ export function createMajorAdvisorServer() {
         "For Tawjihi, collect the branch and overall average. Ask for the core-subject average only if the student may need an alternative Dentistry, Pharmacy, or Scientific-stream Engineering route. " +
         "For Bagrut, collect the percentage and Scientific or Literary classification when known. " +
         "For IB, IGCSE, GCSE, GCE, SAT, AP, CLEP, Saudi, or another foreign certificate, ask for the official AAUP or Palestinian Ministry equivalent percentage when available and explain that final eligibility requires official review. " +
-        "Use send_major_match_email only after a report exists, the student provides an email address, and the student explicitly confirms that they want the report emailed. Pass the same report language to the email tool. " +
         "Do not claim that a preliminary match guarantees admission. " +
         "Do not call multiple tools at the same time.",
     }
   );
 
-  registerMajorMatchForm(server);
-  registerShowFormTool(server);
-  registerReportTool(server);
-  registerEmailTool(server);
+  registerMajorMatchForm(
+    server
+  );
 
-  // Uncomment these only when those tools are enabled.
-  // registerCourseFinder(server);
-  // registerSharedCourseDataTool(server);
+  registerShowFormTool(
+    server
+  );
+
+  registerReportTool(
+    server
+  );
 
   return server;
 }
