@@ -1,0 +1,274 @@
+{
+  "academicYear": "2026-2027",
+  "lastVerifiedOn": "2026-07-23",
+  "scope": "Admission-average and certificate-conversion rules for AAUP bachelor, intermediate diploma, and upper-basic education diploma applicants.",
+  "sourcePriority": [
+    "Current official AAUP 2026/2027 web pages",
+    "Attached 2026/2027 PDF and DOC admission materials",
+    "No unsupported assumptions"
+  ],
+  "officialSources": {
+    "tawjihiAdmissions": "https://www.aaup.edu/ar/join-aaup/admission-bachelor-and-diploma-programs",
+    "bagrutAdmissions": "https://www.aaup.edu/ar/study/tuition-fees-and-costs/specializations-and-conditions-admission-bachelors-programs/bagrut-related-information",
+    "foreignCertificateRules": "https://www.aaup.edu/ar/study/tuition-fees-and-costs/specializations-and-conditions-admission-bachelor%E2%80%99s-programs/foreign-international-related-information"
+  },
+  "systems": {
+    "Tawjihi": {
+      "type": "Palestinian secondary certificate",
+      "programSpecificMinimumField": "minimumAverageTawjihi",
+      "branchFields": [
+        "eligibleBranches",
+        "minimumAverageTawjihiByBranch"
+      ],
+      "notes": [
+        "Some programs use branch-specific minimums or an alternative core-subject average.",
+        "The current official website overrides older values in the attached PDFs where the sources differ."
+      ]
+    },
+    "Bagrut": {
+      "type": "Bagrut / Taodat Bagrut / תעודת בגרות",
+      "programSpecificMinimumField": "minimumAverageBagrut",
+      "scientificClassification": {
+        "anyOf": [
+          {
+            "minimumScientificUnits": 9,
+            "minimumMathematicsUnits": 4
+          },
+          {
+            "minimumScientificUnits": 11,
+            "minimumMathematicsUnits": 3
+          }
+        ],
+        "preparatoryPathForLiteraryClassification": {
+          "courses": [
+            "Biology",
+            "Chemistry",
+            "Physics"
+          ],
+          "scientificUnitsGrantedPerPassedCourse": 3,
+          "result": "Scientific classification after the required preparatory courses are passed.",
+          "exception": "This preparatory reclassification route does not apply to Faculty of Dentistry programs."
+        },
+        "scientificUnitSubjectsListedByAAUP": [
+          "Agriculture",
+          "Auto Control",
+          "Auto Mechanics Systems",
+          "Biochemistry",
+          "Biology",
+          "Biology Lab",
+          "Biology Thesis",
+          "Biotechnology",
+          "Biotechnology Systems",
+          "Biology Research",
+          "CAM Systems",
+          "Chemistry",
+          "Chemistry Research",
+          "Command and Control Systems",
+          "Communications Systems",
+          "Complex Machines",
+          "Computer Aided Design",
+          "Computer Basics",
+          "Computer Science",
+          "Computerized Information Systems",
+          "Computing and ICT Infrastructure",
+          "Constructing Technology",
+          "Construction Engineering",
+          "Control Machines",
+          "Control and Energy Control Systems",
+          "Digital Systems",
+          "Ecology",
+          "Electrical Systems",
+          "Electricity",
+          "Electronic Systems",
+          "Electronic and Electrical Systems in Vehicles",
+          "Electronics Science",
+          "Electronics and Computer",
+          "Engineering Mechanics",
+          "Engineering Sciences",
+          "Foundations of Information and Communication Technologies",
+          "Health Sciences",
+          "ICT",
+          "IT Systems",
+          "Information Security",
+          "Information Systems",
+          "Knowledge and Data Systems",
+          "Laboratory in Engineering Mechanics",
+          "Machine Control",
+          "Mathematics",
+          "Mathematics Thesis",
+          "Mechanical Engineering",
+          "Mechanical Systems",
+          "Mechanics of Cars",
+          "Mechatronics Systems",
+          "Mechatronics Thesis",
+          "Medical Devices",
+          "Medical Engineering",
+          "Medical Systems",
+          "Mechatronics",
+          "Nursing",
+          "Physics",
+          "Physics Research",
+          "Planning and Programming System",
+          "Planning or Engineering Design of Buildings",
+          "Principles and Fundamentals in Ecology",
+          "Research in Mechatronics",
+          "Science & Technology in Society",
+          "Science and Technology for All",
+          "Software Engineering",
+          "Systems or Foundations of Theoretical Electricity",
+          "Technical Sciences",
+          "Technical Topic: Computer & Networks",
+          "Technological Systems",
+          "Technology Sciences",
+          "Technology Applications",
+          "Telecommunications"
+        ],
+        "reviewNote": "AAUP may review additional scientific units not included in the published list."
+      },
+      "requiredDocuments": [
+        "Online admission application",
+        "Official Bagrut certificate",
+        "Identity card or passport",
+        "Original or certified birth certificate",
+        "Two recent personal photographs",
+        "Stress-test report for Sport Sciences applicants"
+      ]
+    },
+    "IB": {
+      "type": "International Baccalaureate",
+      "requiresPalestinianMinistryEquivalency": true,
+      "gradeConversionToPercent": {
+        "HigherLevel": {
+          "7": 100,
+          "6": 98,
+          "5": 88,
+          "4": 78,
+          "3": 68,
+          "2": null
+        },
+        "StandardLevel": {
+          "7": 98,
+          "6": 95,
+          "5": 85,
+          "4": 75,
+          "3": 65,
+          "2": 55
+        }
+      },
+      "averageFormula": "Sum of converted course percentages divided by number of courses.",
+      "additionalPoints": [
+        "Add the points recorded for Extended Essay (EE) and Theory of Knowledge (TOK).",
+        "For extra Higher Level courses: add 2 percentage points for a grade of 6 or 7, or 1 point for a grade of 5."
+      ],
+      "programSpecificMinimum": null,
+      "decisionMode": "AAUP determines the final equivalent average and admission possibility."
+    },
+    "IGCSE_GCSE_GCE": {
+      "type": "British-system secondary certificates",
+      "requiresPalestinianMinistryEquivalency": true,
+      "courseSelection": "Use the highest two Advanced or Advanced Subsidiary courses and the highest six Ordinary Level courses.",
+      "gradeConversionToPercent": {
+        "AdvancedOrAS": {
+          "A*": 100,
+          "A": 98,
+          "B": 88,
+          "C": 78,
+          "D": 68,
+          "E": 58
+        },
+        "OrdinaryLevel": {
+          "A*": 97,
+          "A": 95,
+          "B": 85,
+          "C": 75,
+          "D": 65
+        },
+        "NumericGCE": {
+          "9_or_8": 100,
+          "7": 98,
+          "6_or_5": 88,
+          "4": 78
+        }
+      },
+      "bonusForAdditionalAdvancedCoursesBeyondTwo": {
+        "A* or A": 2,
+        "B": 1
+      },
+      "scientificClassificationWhenEquivalencyHasNoBranch": {
+        "advancedCoursesRequired": 2,
+        "eligibleAdvancedSubjects": [
+          "Mathematics",
+          "Physics",
+          "Chemistry",
+          "Biology"
+        ],
+        "additionalRequirement": "Mathematics must be included among the Ordinary Level courses."
+      },
+      "programSpecificMinimum": null,
+      "decisionMode": "AAUP determines the final equivalent average and admission possibility."
+    },
+    "SAT": {
+      "requiresPalestinianMinistryEquivalency": true,
+      "publishedCourseConversionFormula": "(course score × 0.1) + 25",
+      "averageFormula": "Average the converted SAT II subjects listed in the Ministry equivalency; if subjects are not listed, AAUP decides case by case.",
+      "programSpecificMinimum": null,
+      "decisionMode": "AAUP determines the final equivalent average and admission possibility."
+    },
+    "AP": {
+      "requiresPalestinianMinistryEquivalency": true,
+      "gradeConversionToPercent": {
+        "5": 100,
+        "4": 96,
+        "3": 89,
+        "2": 77
+      },
+      "averageFormula": "Sum of converted subject percentages divided by number of subjects.",
+      "programSpecificMinimum": null,
+      "decisionMode": "AAUP determines the final equivalent average and admission possibility."
+    },
+    "CLEP": {
+      "requiresPalestinianMinistryEquivalency": true,
+      "publishedCourseConversionFormula": "65 + (0.78 × (course score - 35))",
+      "averageFormula": "Sum of converted subject percentages divided by number of subjects.",
+      "programSpecificMinimum": null,
+      "decisionMode": "AAUP determines the final equivalent average and admission possibility."
+    },
+    "SaudiSecondaryCertificate": {
+      "requiresPalestinianMinistryCertification": true,
+      "requiredExamsForStudentsCompletingSecondaryFrom2017Onward": [
+        "General Aptitude Test (Qudurat)",
+        "Achievement Test (Tahsili)"
+      ],
+      "admissionAverageFormula": {
+        "secondarySchoolAverageWeight": 0.5,
+        "aptitudeTestWeight": 0.25,
+        "achievementTestWeight": 0.25,
+        "formula": "(secondary average × 0.50) + (aptitude score × 0.25) + (achievement score × 0.25)"
+      },
+      "programSpecificMinimum": null,
+      "decisionMode": "AAUP determines the final equivalent average and admission possibility."
+    },
+    "OtherArabOrForeignEquivalency": {
+      "requiresOfficialPalestinianEquivalency": true,
+      "percentageRule": "If the equivalency contains a percentage, AAUP uses it as stated; otherwise the applicable conversion method is used.",
+      "branchRule": "If the equivalency states a branch, it is used. If it does not, scientific classification follows Palestinian Ministry equivalency rules.",
+      "studyLocationEvidence": "Applicants may need proof that the required secondary-school years were studied in the country issuing the equivalency.",
+      "programSpecificMinimum": null,
+      "decisionMode": "Case-by-case review by the Deanship of Admission and Registration."
+    }
+  },
+  "importantCautions": [
+    "A converted foreign-certificate percentage is not a guaranteed admission result.",
+    "The official website does not publish a separate program minimum for IB, British-system, SAT, AP, CLEP, or Saudi applicants; those fields remain null in the program records.",
+    "Some programs require interviews, theoretical tests, practical tests, health-sciences ability testing, fitness testing, or medical fitness documentation.",
+    "Admission availability and fees can change; the dataset records the Fall 2026/2027 status verified on 2026-07-23."
+  ],
+  "applicationCycle": {
+    "term": "Fall 2026/2027",
+    "applicationsOpen": "2026-06-29",
+    "applicationsClose": "2026-09-19",
+    "classesBegin": "2026-09-20",
+    "admissionCardFeeNIS": 200,
+    "admissionCardRefundable": false
+  }
+}
