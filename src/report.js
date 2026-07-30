@@ -2131,8 +2131,7 @@ export function createReport(
 
     text.noteLastVerified(
       formatDate(
-        admissionSystems
-          .lastVerifiedOn,
+        admissionSystems.lastVerifiedOn,
         language
       )
     ),
@@ -2170,6 +2169,7 @@ export function createReport(
     ...foreignNotes,
     text.noteTuition,
     text.noteFinal,
+    text.disclaimer,
   ];
 
   return `${text.title}

@@ -1,6 +1,9 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  validateAdmissionsData,
+} from "./dataValidation.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -255,40 +258,47 @@ function readJsonFile(path, label) {
   }
 }
 
-export function loadMajors() {
-  if (!majorsCache) {
-    const majors = readJsonFile(
+function loadValidatedData() {
+  if (
+    majorsCache &&
+    admissionSystemsCache
+  ) {
+    return;
+  }
+
+  const rawMajors =
+    readJsonFile(
       MAJORS_FILE,
       "AAUP majors data"
     );
 
-    if (!Array.isArray(majors)) {
-      throw new Error(
-        "The AAUP majors data must be a JSON array."
-      );
-    }
+  const rawAdmissionSystems =
+    readJsonFile(
+      ADMISSION_SYSTEMS_FILE,
+      "AAUP admission systems data"
+    );
 
-    majorsCache = majors;
-  }
+  const validated =
+    validateAdmissionsData(
+      rawMajors,
+      rawAdmissionSystems
+    );
+
+  majorsCache =
+    validated.majors;
+
+  admissionSystemsCache =
+    validated.admissionSystems;
+}
+
+export function loadMajors() {
+  loadValidatedData();
 
   return majorsCache;
 }
 
 export function loadAdmissionSystems() {
-  if (!admissionSystemsCache) {
-    const systems = readJsonFile(
-      ADMISSION_SYSTEMS_FILE,
-      "AAUP admission systems data"
-    );
-
-    if (!systems || typeof systems !== "object") {
-      throw new Error(
-        "The AAUP admission systems data must be a JSON object."
-      );
-    }
-
-    admissionSystemsCache = systems;
-  }
+  loadValidatedData();
 
   return admissionSystemsCache;
 }

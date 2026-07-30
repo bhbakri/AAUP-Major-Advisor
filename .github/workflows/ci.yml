@@ -1,0 +1,49 @@
+name: AAUP Major Advisor CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Validate and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check server.js
+          node --check src/aaupServer.js
+          node --check src/dataValidation.js
+          node --check src/majorMatchForm.js
+          node --check src/report.js
+          node --check src/uiStrings.js
+          node --check src/utils.js
+
+      - name: Run automated tests
+        run: npm test
