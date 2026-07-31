@@ -1,0 +1,27 @@
+services:
+  major-advisor:
+    container_name: aaup-major-advisor
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    env_file:
+      - docker.env
+
+    ports:
+      # AAUP server port 3001 -> container port 3000
+      #
+      # Binding to 127.0.0.1 prevents direct public access.
+      # The AAUP reverse proxy should access it locally.
+      - "127.0.0.1:3001:3000"
+
+    restart: unless-stopped
+
+    # Ensures signals are forwarded correctly to Node.
+    init: true
+
+    stop_grace_period: 15s
+
+    security_opt:
+      - no-new-privileges:true

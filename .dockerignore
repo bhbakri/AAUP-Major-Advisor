@@ -1,0 +1,29 @@
+# Dependencies are installed inside the image
+node_modules
+
+# Git files
+.git
+.github
+
+# Local environment files
+.env
+.env.*
+docker.env
+
+# Local logs
+*.log
+npm-debug.log*
+
+# Tests and coverage are not needed at runtime
+test
+coverage
+
+# Documentation and editor files
+README.md
+SECURITY.md
+.vscode
+.idea
+
+# Operating-system files
+.DS_Store
+Thumbs.db
