@@ -1,7 +1,10 @@
 import {
   McpServer,
 } from "@modelcontextprotocol/sdk/server/mcp.js";
-
+import {
+  APP_NAME,
+  APP_VERSION,
+} from "./version.js";
 import {
   registerMajorMatchForm,
   registerShowFormTool,
@@ -26,11 +29,12 @@ const SERVER_INSTRUCTIONS =
 export function createMajorAdvisorServer() {
   const server = new McpServer(
     {
-      name: "aaup-major-match",
-      version: "0.5.0",
+      name: APP_NAME,
+      version: APP_VERSION,
     },
     {
-      instructions: SERVER_INSTRUCTIONS,
+      instructions:
+        SERVER_INSTRUCTIONS,
     }
   );
 
