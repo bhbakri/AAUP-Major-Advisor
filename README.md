@@ -1,50 +1,58 @@
 # AAUP Major Advisor
 
-A bilingual English–Arabic MCP application that helps prospective AAUP students explore bachelor’s programs based on their certificate system, branch or classification, academic average, campus preference, interests, and tuition budget.
+The **AAUP Major Advisor** is a bilingual English–Arabic application that helps prospective students explore bachelor’s programs at Arab American University.
 
-> This application provides preliminary guidance only. It does not guarantee admission or replace an official decision by the AAUP Deanship of Admission and Registration.
+Students can use the Advisor through an AI-assisted conversation or directly through its visual form. Recommendations are based on certificate system, branch or classification, academic average, campus preference, interests, career goals, and tuition preference.
+
+> Results provide preliminary academic guidance. Final admission eligibility must be confirmed by the AAUP Deanship of Admission and Registration.
 
 ## Features
 
-- English and Arabic support
-- Right-to-left Arabic interface
-- Visual major-selection form inside ChatGPT
-- Chat-based major advising
-- Preliminary eligibility checking
-- Jenin and Ramallah campus filtering
-- Interest and career-goal matching
-- Tuition-budget comparison
-- Support for Tawjihi, Bagrut, and foreign certificate systems
-- No database, email service, student account, or GPU required
+* English and Arabic support
+* Right-to-left Arabic interface
+* AI-assisted and direct form use
+* Preliminary eligibility checking
+* Jenin and Ramallah campus filtering
+* Tawjihi and Bagrut support
+* Foreign-certificate review guidance
+* Alternative admission-route handling
+* Interest and career-goal matching
+* Tuition and budget comparison
+* Official AAUP source references
+* Admissions-data expiration protection
+* Startup data validation
+* Automated tests and GitHub Actions
+* Rate limiting and health monitoring
+* No database or GPU required
 
 ## MCP Tools
 
 ### `show_major_match_form`
 
-Opens the bilingual visual major-selection form.
+Opens the bilingual visual form used to collect the student’s academic information and preferences.
 
 ### `create_major_match_report`
 
-Creates an English or Arabic preliminary major recommendation based on the student’s information.
+Generates an English or Arabic report containing:
 
-Both tools are read-only and do not make official admission decisions.
+* Preliminarily eligible programs
+* Programs requiring official review
+* Programs that do not meet a published requirement
+* Campus and college information
+* Published admission requirements
+* Tuition information
+* Additional program conditions
+* Interest and career-fit explanations
 
-## MCP Endpoint
-
-```text
-/mcp
-```
-
-After deployment:
-
-```text
-https://your-domain.example/mcp
-```
+Both tools are read-only. They do not submit applications, reserve seats, modify university records, or make official admission decisions.
 
 ## Project Structure
 
 ```text
 AAUP-Major-Advisor/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── data/
 │   ├── admissionSystems.json
 │   └── majors.json
@@ -52,40 +60,36 @@ AAUP-Major-Advisor/
 │   ├── ui/
 │   │   └── majorMatchForm.html
 │   ├── aaupServer.js
+│   ├── dataValidation.js
 │   ├── majorMatchForm.js
 │   ├── majorMatchLanguage.js
 │   ├── majorMatchTools.js
 │   ├── report.js
-│   └── utils.js
-├── server.js
+│   ├── utils.js
+│   └── version.js
+├── test/
+│   └── advisor.test.js
+├── .env.example
+├── .gitignore
 ├── package.json
 ├── package-lock.json
+├── server.js
 └── README.md
 ```
 
-## File Overview
+## Technology
 
-- `server.js` — runs the Express server and exposes `/mcp`
-- `src/aaupServer.js` — creates the MCP server and registers the tools
-- `src/majorMatchForm.js` — loads and registers the visual form
-- `src/majorMatchLanguage.js` — contains English and Arabic interface text
-- `src/majorMatchTools.js` — contains tool schemas and report-tool handling
-- `src/ui/majorMatchForm.html` — contains the form HTML, CSS, and JavaScript
-- `src/report.js` — contains eligibility and recommendation logic
-- `src/utils.js` — loads data and parses certificate systems, branches, and numbers
-- `data/majors.json` — contains bachelor-program data
-- `data/admissionSystems.json` — contains certificate-system and academic-year data
-
-## Technology Stack
-
-- Node.js
-- Express
-- Model Context Protocol
-- `@modelcontextprotocol/sdk`
-- `@modelcontextprotocol/ext-apps`
-- Zod
-- HTML, CSS, and vanilla JavaScript
-- Local JSON data
+* Node.js 22
+* Express
+* Model Context Protocol
+* `@modelcontextprotocol/sdk`
+* `@modelcontextprotocol/ext-apps`
+* Zod
+* `express-rate-limit`
+* HTML, CSS, and vanilla JavaScript
+* Local JSON admissions data
+* Node test runner
+* GitHub Actions
 
 ## Local Setup
 
@@ -102,101 +106,174 @@ Install dependencies:
 npm install
 ```
 
+Run the tests:
+
+```bash
+npm test
+```
+
 Start the server:
 
 ```bash
 npm start
 ```
 
-The default local addresses are:
+The application runs on port `8787` by default.
 
 ```text
-Status page: http://localhost:8787/
-MCP endpoint: http://localhost:8787/mcp
+Status:    http://localhost:8787/
+MCP:       http://localhost:8787/mcp
+Health:    http://localhost:8787/healthz
+Readiness: http://localhost:8787/readyz
 ```
 
-Opening `/mcp` directly in a browser may not display a normal webpage because it expects MCP requests.
+## Environment Variables
 
-## Render Deployment
+Production variables are documented in `.env.example`.
 
-Create a Render **Web Service** with:
-
-```text
-Runtime: Node
-Build Command: npm install
-Start Command: npm start
+```env
+NODE_ENV=production
+PORT=8787
+OPENAI_APPS_CHALLENGE=
+TRUST_PROXY=
+REQUEST_TIMEOUT_MS=120000
+HEADERS_TIMEOUT_MS=65000
+KEEP_ALIVE_TIMEOUT_MS=60000
 ```
 
-Render automatically provides the `PORT` environment variable.
+`TRUST_PROXY` should match the production reverse-proxy configuration. It should remain blank during local development.
 
-The deployed MCP URL will look like:
+## Production Deployment
+
+Install locked production dependencies:
+
+```bash
+npm ci --omit=dev
+```
+
+Start the application:
+
+```bash
+npm start
+```
+
+The public MCP endpoint is:
 
 ```text
-https://your-service-name.onrender.com/mcp
+https://advisor.aaup.edu/mcp
+```
+
+The production environment should provide HTTPS through a reverse proxy and monitor:
+
+```text
+/healthz
+/readyz
 ```
 
 ## Server Requirements
 
-Recommended starting configuration:
+### Minimum
+
+Suitable for development, testing, and limited production traffic.
 
 ```text
 Operating system: Linux
-Node.js: Version 22
+Node.js: 22
 CPU: 1 vCPU
 RAM: 1 GB
-Storage: 2–5 GB
+Storage: 2 GB
 GPU: Not required
 Database: Not required
-Public HTTPS: Required
+HTTPS: Required
 ```
 
-## Data and Privacy
+### Suggested
 
-The application uses local JSON files and does not currently store:
+Recommended for the public AAUP deployment.
 
-- Student accounts
-- Passwords
-- Generated reports
-- Email addresses
-- Chat conversations
-- Uploaded documents
-- Payment information
+```text
+Operating system: Linux
+Node.js: 22
+CPU: 2 vCPUs
+RAM: 2 GB
+Storage: 5 GB
+GPU: Not required
+Database: Not required
+HTTPS: Required
+Reverse proxy: Recommended
+Process manager: Recommended
+Monitoring: Recommended
+```
 
-Students should not enter sensitive information such as passwords, identification numbers, payment details, or medical records.
+Actual capacity depends on traffic patterns, rate-limit configuration, logging volume, and other services running on the same server.
 
-## Updating Admissions Data
+## Admissions Data
 
-Update:
+Program and certificate-system information is stored in:
 
 ```text
 data/majors.json
 data/admissionSystems.json
 ```
 
-Then restart the server so the updated data is loaded.
+The data includes:
 
-## Important Limitations
+* Program names in English and Arabic
+* Campuses and colleges
+* Eligible certificate branches
+* Minimum averages
+* Alternative admission routes
+* Tuition information
+* Additional admission conditions
+* Academic-year dates
+* Verification dates
+* Official AAUP sources
 
-- Admission requirements may change.
-- Foreign certificates may require official equivalency.
-- Some programs require interviews, tests, medical documents, or other conditions.
-- Tuition and scholarship information must be confirmed officially.
-- The application does not replace AAUP admissions staff or academic advisors.
+After updating the data, run:
 
-## Publishing Preparation
+```bash
+npm test
+npm start
+```
 
-Before an official public launch, the project should have:
+The application validates the admissions files before accepting traffic. Invalid or inconsistent data prevents the server from starting.
 
-- AAUP approval and branding authorization
-- Stable HTTPS hosting
-- Current admissions data
-- Privacy policy
-- Terms of use
-- Support contact
-- Rate limiting
-- Monitoring and security testing
-- Publisher and domain verification
+## Testing and CI
 
-## Author
+Run all tests:
 
-AAUP
+```bash
+npm test
+```
+
+Run coverage:
+
+```bash
+npm run test:coverage
+```
+
+The tests cover data validation, Arabic and English input handling, certificate detection, eligibility reports, recommendation ordering, foreign certificates, invalid averages, and expired admission cycles.
+
+GitHub Actions automatically runs syntax checks and tests on pushes and pull requests to `main`.
+
+## Privacy and Security
+
+The application does not require student accounts and does not intentionally store:
+
+* Passwords
+* Student IDs
+* Generated reports
+* Uploaded documents
+* Payment information
+* Chat histories
+* Official academic records
+
+The server includes rate limiting, restricted MCP methods, request timeouts, startup validation, health checks, readiness checks, and graceful shutdown.
+
+Students should not submit passwords, identification numbers, payment details, medical records, or other unnecessary sensitive information.
+
+## Ownership
+
+The AAUP Major Advisor is operated and published by **Arab American University**.
+
+The repository and its contents are unlicensed unless AAUP provides a separate license. Public visibility does not grant permission to copy, redistribute, commercially reuse, or misrepresent AAUP code, data, branding, or institutional content.

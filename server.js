@@ -126,7 +126,7 @@ let shuttingDown = false;
 
 const mcpLimiter = rateLimit({
   windowMs: 60 * 1000,
-  limit: 30,
+  limit: 200,
 
   standardHeaders: true,
   legacyHeaders: false,
