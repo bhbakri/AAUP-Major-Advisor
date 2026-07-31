@@ -1,0 +1,13 @@
+# Default repository owners
+* @bhbakri
+
+# Admissions data changes
+/data/ @bhbakri
+
+# Advisor and eligibility logic
+/src/report.js @bhbakri
+/src/dataValidation.js @bhbakri
+
+# Production server and workflows
+/server.js @bhbakri
+/.github/workflows/ @bhbakri
