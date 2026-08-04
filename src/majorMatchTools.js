@@ -40,7 +40,10 @@ export function registerReportTool(server) {
     {
       title: "Ask AAUP Major Advisor",
       description:
-        "Creates English or Arabic preliminary AAUP major recommendations from the full 2026/2027 bachelor-program dataset.",
+        "Creates the authoritative and complete AAUP Student Major Match Report. " +
+        "Call this tool immediately whenever a student requests program recommendations, eligibility results, matches, or a report and the required information is available. " +
+        "Do not manually generate or independently rewrite a major recommendation report. " +
+        "The complete returned text, including all headings, warnings, disclaimers, and official Next Steps links, must be displayed to the student without summarizing or replacing it.",
       inputSchema: {
         language: languageSchema.describe(
           "Report language. Infer ar for Arabic conversations and en for English unless the student explicitly chooses another language."
