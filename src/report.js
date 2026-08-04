@@ -20,6 +20,17 @@ const ARABIC_TEXT_PATTERN = /[\u0600-\u06ff]/;
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const DATA_MAX_AGE_DAYS = 90;
 
+const OFFICIAL_NEXT_STEP_LINKS = {
+  academicPrograms:
+    "https://www.aaup.edu/academic-programs",
+
+  contactAdmissions:
+    "https://www.aaup.edu/contact-us",
+
+  applyForAdmission:
+    "https://portal.aaup.edu/faces/ui/pages/guest/admissionOnline/index.xhtml",
+};
+
 const SYSTEM_LABELS = {
   en: {
     Tawjihi: "Tawjihi",
@@ -145,6 +156,13 @@ const REPORT_TEXT = {
       "Close Options That Do Not Currently Meet a Published Requirement",
 
     notesHeading: "Important Notes",
+    nextStepsHeading: "Next Steps",
+    academicProgramsLink:
+      "Explore Academic Programs",
+    contactAdmissionsLink:
+      "Contact Admissions",
+    applyForAdmissionLink:
+      "Apply for Admission",
     eligibleStatus: "Preliminarily eligible",
     reviewStatus: "Official review required",
     status: "Status",
@@ -377,6 +395,13 @@ const REPORT_TEXT = {
       "تخصصات قريبة لا يستوفي الطالب أحد شروطها المنشورة حالياً",
 
     notesHeading: "ملاحظات مهمة",
+    nextStepsHeading: "الخطوات التالية",
+    academicProgramsLink:
+      "استكشف البرامج الأكاديمية",
+    contactAdmissionsLink:
+      "تواصل مع القبول والتسجيل",
+    applyForAdmissionLink:
+      "قدّم طلب الالتحاق",
     eligibleStatus: "مؤهل مبدئياً",
     reviewStatus: "تحتاج إلى مراجعة رسمية",
     status: "الحالة",
@@ -604,7 +629,14 @@ function detectReportLanguage(args) {
 function t(language) {
   return REPORT_TEXT[language] ?? REPORT_TEXT.en;
 }
+function buildNextSteps(language) {
+  const text = t(language);
 
+  return `${text.nextStepsHeading}:
+  - ${text.academicProgramsLink}: ${OFFICIAL_NEXT_STEP_LINKS.academicPrograms}
+  - ${text.contactAdmissionsLink}: ${OFFICIAL_NEXT_STEP_LINKS.contactAdmissions}
+  - ${text.applyForAdmissionLink}: ${OFFICIAL_NEXT_STEP_LINKS.applyForAdmission}`;
+  }
 function parseIsoDate(value) {
   if (typeof value !== "string") {
     return null;
@@ -790,6 +822,8 @@ ${text.noteApplicationWindow(
 ${sourceText}
 
 ${text.staleDataNextStep}
+
+${buildNextSteps(language)}
 
 ${text.disclaimer}`.trim();
 }
@@ -1691,6 +1725,8 @@ ${systems.join("\n")}
 
 ${text.foreignAverageHelp}
 
+${buildNextSteps(language)}
+
 ${text.disclaimer}`;
 }
 
@@ -1720,6 +1756,8 @@ ${branches.join("\n")}
 
 ${text.branchHelp}
 
+${buildNextSteps(language)}
+
 ${text.disclaimer}`;
 }
 
@@ -1742,6 +1780,8 @@ ${text.invalidAverageTitle}: "${
   }".
 
 ${explanation}
+
+${buildNextSteps(language)}
 
 ${text.disclaimer}`;
 }
@@ -2218,5 +2258,7 @@ ${notes
   .map(
     (note) => `- ${note}`
   )
-  .join("\n")}`.trim();
+  .join("\n")}
+
+${buildNextSteps(language)}`.trim();
 }
